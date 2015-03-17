@@ -1,9 +1,9 @@
 #!/bin/sh
 
 OPT_CHECK='-d 1'
-OPT_UPDATE='-d 1 -C -R 10 -y --exclude=kernel*,openssh*,gcc*,kde*,php*,mysql*,zabbix*'
+OPT_UPDATE='-d 1 -R 10 -y --exclude=kernel*,openssh*,gcc*,kde*,php*,mysql*,zabbix*'
 HOSTNAME=`hostname`
-DATE=`date +%Y-%m-%d_%H:%M:%S`
+DATE=`date '+%Y-%m-%d %H:%M:%S'`
 SENDMAIL='/usr/sbin/sendmail'
 
 if [ `id -u` != `id -u root` ]; then
@@ -11,34 +11,52 @@ if [ `id -u` != `id -u root` ]; then
 	exit 1
 fi
 
+### arg1: echo flg
+FLG=0
+if [ $# -gt 0 ]; then
+	FLG=$1
+fi
+
 ### from env
 EMAIL=`echo $MAILTO`
-
-if [ -z ${EMAIL} ]; then
-	EMAIL='root'
-fi
 
 set -u
 
 TMP=`mktemp`
 
 cat <<_EOT_ >> ${TMP}
-From: root@${HOSTNAME}
-To: ${EMAIL}
-Subject: yum ${DATE} ${HOSTNAME}
-
-yum chech-update ${OPT_CHECK}
+# ---------------------------------------------------------
+# yum chech-update ${OPT_CHECK}
+# ---------------------------------------------------------
 _EOT_
 
 yum check-update ${OPT_CHECK} >> ${TMP}
 
 cat <<_EOT_ >> ${TMP}
-
-yum update ${OPT_UPDATE}
+# ---------------------------------------------------------
+# yum update ${OPT_UPDATE}
+# ---------------------------------------------------------
 _EOT_
 
 yum update ${OPT_UPDATE} >> ${TMP}
 
-cat ${TMP} | ${SENDMAIL} -t
+if [ "${FLG}" = 0 ]; then
+	if [ ! -z "${EMAIL}" ]; then
+		BODY=`mktemp`
+		cat <<_EOT_ >> ${BODY}
+From: root@${HOSTNAME}
+To: ${EMAIL}
+Subject: yum ${DATE} ${HOSTNAME}
+
+_EOT_
+		cat ${TMP} >> ${BODY}
+
+		cat ${BODY} | ${SENDMAIL} -t
+
+		rm ${BODY}
+	fi
+else
+	cat ${TMP}
+fi
 
 rm ${TMP}
