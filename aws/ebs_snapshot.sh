@@ -27,9 +27,6 @@ if [ ${#} -gt 0 ]; then
 	TAG=${1}
 fi
 
-### get owner_id
-OWNER_ID=`aws iam get-user --output text --query='User.UserId'`
-
 ### get EBS volumes
 VOLUMES=`${GET_LIST_TAGS} --output=text --filters Name=resource-type,Values=volume Name=key,Values=${TAG} --query="Tags[*][ResourceId,Value]" | sed -e "s/\t/,/g"`
 
@@ -80,7 +77,7 @@ for VOL in ${VOLUMES}; do
 	${CREATE_TAG} --resources=${CREATE_SNAP_ID} --tags="Key=Name,Value=\"${VOL_NAME}\""
 
 	### get snapshots
-	SNAPSHOTS=`${GET_LIST_SNAPSHOT} --output=text --owner-ids ${OWNER_ID} --filters Name=volume-id,Values=${VOL_ID} --query="Snapshots[*][StartTime,SnapshotId]" | sort -r | sed -e "s/\t/,/g"`
+	SNAPSHOTS=`${GET_LIST_SNAPSHOT} --output=text --owner-ids=self --filters Name=volume-id,Values=${VOL_ID} --query="Snapshots[*][StartTime,SnapshotId]" | sort -r | sed -e "s/\t/,/g"`
 
 	if [ $? != 0 ]; then
 		logger -t ${CMD} "[ERROR] ${GET_LIST_SNAPSHOT}"
