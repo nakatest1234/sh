@@ -40,4 +40,4 @@ if [ "$?" != 0 ]; then
 	exit 1
 fi
 
-${POSTFIX_CMD} reload > /dev/null
+service postfix reload > /dev/null
