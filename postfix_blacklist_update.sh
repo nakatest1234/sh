@@ -2,7 +2,8 @@
 
 HOST="https://ipv4.fetus.jp/"
 POSTFIX_CMD="/usr/sbin/postfix"
-POSTFIX_DIR="/etc/postfix/blacklist/"
+DENY_FILE="/etc/postfix/deny_ip.txt"
+DENY_ORG="/etc/postfix/deny_ip_org.txt"
 
 LIST=(
 ae.postfix.txt
@@ -13,25 +14,31 @@ mg.postfix.txt
 th.postfix.txt
 tw.postfix.txt
 vn.postfix.txt
+br.postfix.txt
+la.postfix.txt
+id.postfix.txt
+my.postfix.txt
+mx.postfix.txt
+bd.postfix.txt
+es.postfix.txt
+de.postfix.txt
+pl.postfix.txt
+ar.postfix.txt
+cl.postfix.txt
+it.postfix.txt
+gh.postfix.txt
 )
 
-TMP_DIR=`mktemp -d tmp.XXXXXXXXXX`
+TMP_FILE=`mktemp tmp.XXXXXXXXXX`
+
+cp -fp ${DENY_ORG} ${TMP_FILE}
 
 for file in ${LIST[@]}; do
-	wget -q ${HOST}${file} -O ${TMP_DIR}/${file}
-	if [ "$?" != 0 ]; then
-		rm -Rf ${TMP_DIR}
-		echo "wget error." >&2
-		exit 1
-	fi
-	sleep 1
+	wget -q ${HOST}${file} -O - >> ${TMP_FILE}
+	sleep 0.5
 done
 
-for file in ${LIST[@]}; do
-	cp -fp ${TMP_DIR}/${file} ${POSTFIX_DIR}/${file}
-done
-
-rm -Rf ${TMP_DIR}
+mv -f ${TMP_FILE} ${DENY_FILE}
 
 ${POSTFIX_CMD} check
 
@@ -40,4 +47,4 @@ if [ "$?" != 0 ]; then
 	exit 1
 fi
 
-${POSTFIX_CMD} reload > /dev/null
+service postfix reload > /dev/null
