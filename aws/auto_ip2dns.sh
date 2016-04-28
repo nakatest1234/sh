@@ -1,5 +1,21 @@
 #!/bin/sh
 
+### Show Policy
+### {
+###     "Version": "2012-10-17",
+###     "Statement": [
+###         {
+###             "Action": [
+###                 "route53:ChangeResourceRecordSets"
+###             ],
+###             "Effect": "Allow",
+###             "Resource": [
+###                 "arn:aws:route53:::hostedzone/Z32I5QZAJJE8AM"
+###             ]
+###         }
+###     ]
+### }
+
 ZONEID=$1
 PUBLIC_HOST=$2
 
