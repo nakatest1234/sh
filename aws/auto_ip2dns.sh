@@ -10,7 +10,7 @@
 ###             ],
 ###             "Effect": "Allow",
 ###             "Resource": [
-###                 "arn:aws:route53:::hostedzone/Z32I5QZAJJE8AM"
+###                 "arn:aws:route53:::hostedzone/Z123456789ABCD"
 ###             ]
 ###         }
 ###     ]
