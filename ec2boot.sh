@@ -28,22 +28,28 @@ ZABBIX_AGENTD_CONF=/etc/zabbix/zabbix_agentd.conf
 
 case "$1" in
 	start)
-		if [ ! -z ${TMP_DIR} -a ! -d ${TMP_DIR} ]; then
-			mkdir -p ${TMP_DIR}
-			chmod ugo+rwx ${TMP_DIR}
+		if [ ! -z ${TMP_DIR} ]; then
+			if [ ! -d ${TMP_DIR} ]; then
+				mkdir -p ${TMP_DIR}
+				chmod ugo+rwx ${TMP_DIR}
+			fi
 		fi
 
 
-		if [ ! -z ${NGINX_DIR} -a ! -d ${NGINX_DIR} ]; then
-			mkdir -p ${NGINX_DIR}
-			chown nginx:nginx ${NGINX_DIR}
+		if [ ! -z ${NGINX_DIR} ]; then
+			if [ ! -d ${NGINX_DIR} ]; then
+				mkdir -p ${NGINX_DIR}
+				chown nginx:nginx ${NGINX_DIR}
+			fi
 		fi
 
-		if [ ! -z ${ZABBIX_AGENTD_CONF} -a -f ${ZABBIX_AGENTD_CONF} ]; then
-			SETTING_NEW="Hostname=`echo ${HOSTNAME%%.*}`"
-			SETTING_OLD=`grep -e "^Hostname=" ${ZABBIX_AGENTD_CONF}`
-			if [ "${SETTING_NEW}" != "${SETTING_OLD}" ]; then
-				sed -i "s/^Hostname=.*/${SETTING_NEW}/g" ${ZABBIX_AGENTD_CONF}
+		if [ ! -z ${ZABBIX_AGENTD_CONF} ]; then
+			if [ -f ${ZABBIX_AGENTD_CONF} ]; then
+				SETTING_NEW="Hostname=`echo ${HOSTNAME%%.*}`"
+				SETTING_OLD=`grep -e "^Hostname=" ${ZABBIX_AGENTD_CONF}`
+				if [ "${SETTING_NEW}" != "${SETTING_OLD}" ]; then
+					sed -i "s/^Hostname=.*/${SETTING_NEW}/g" ${ZABBIX_AGENTD_CONF}
+				fi
 			fi
 		fi
 
