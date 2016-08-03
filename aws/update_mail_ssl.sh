@@ -26,7 +26,6 @@ function post_slack() {
 }
 
 WEBHOOKURL="https://hooks.slack.com/services/XXXXXXXX/YYYYYYYYY/ZZZZZZZZZZZZZZZZZZZZZZZZ"
-CHANNEL="#general"
 
 ### SG add rule
 aws ec2 authorize-security-group-ingress --group-id sg-XXXXXXXX --protocol tcp --port 80 --cidr 0.0.0.0/0
@@ -41,5 +40,5 @@ service postfix reload
 service dovecot reload
 
 if [ $? = 0 ]; then
-	post_slack $WEBHOOKURL $CHANNEL "update mail.example.com certfile."
+	post_slack $WEBHOOKURL "#general" "update mail.example.com certfile."
 fi
