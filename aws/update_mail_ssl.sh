@@ -7,6 +7,9 @@
 # postfix, dovecotの設定reload
 # slackに通知
 
+# crontabで呼び出すときの例
+# 0 5 1 1,3,5,7,9,11 * root AWS_DEFAULT_REGION=ap-northeast-1 /bin/sh /root/update_mail_ssl.sh
+
 function post_slack() {
 	local URL=$1
 	local CHANNEL=$2
