@@ -1,5 +1,8 @@
 #!/bin/sh
 
+### /etc/sysconfig/iptables-config
+### IPTABLES_MODULES="ip_conntrack_ftp ip_nat_ftp"
+
 CMD_IPTABLES_SAVE='/sbin/iptables-save'
 CMD_IPTABLES_CONF='/etc/sysconfig/iptables';
 CMD_IPTABLES_START='/bin/systemctl start iptables'
