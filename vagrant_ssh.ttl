@@ -1,4 +1,4 @@
-; vagrant ssh-config•\¦‚³‚ê‚½ƒ|[ƒg‚ÆŒ®ƒpƒXƒRƒs[‚µ‚Ä“\‚è•t‚¯‚é
+; vagrant ssh-configè¡¨ç¤ºã•ã‚ŒãŸãƒãƒ¼ãƒˆã¨éµãƒ‘ã‚¹ã‚³ãƒ”ãƒ¼ã—ã¦è²¼ã‚Šä»˜ã‘ã‚‹
 
 host = '127.0.0.1'
 port = ''
@@ -31,5 +31,4 @@ endif
 
 sprintf2 constr '%s:%s /ssh /2 /auth=publickey /user=%s /keyfile=%s' host port user file
 
-messagebox constr ''
 connect constr
