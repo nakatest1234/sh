@@ -1,0 +1,35 @@
+; vagrant ssh-config表示されたポートと鍵パスコピーして貼り付ける
+
+host = '127.0.0.1'
+port = ''
+user = 'vagrant'
+file = ''
+
+strcompare host ''
+if result=0 then
+	inputbox '' 'host'
+	host = inputstr
+endif
+
+strcompare port ''
+if result=0 then
+	inputbox '' 'port'
+	port = inputstr
+endif
+
+strcompare user ''
+if result=0 then
+	inputbox '' 'user'
+	user = inputstr
+endif
+
+strcompare file ''
+if result=0 then
+	inputbox '' 'private_key file path'
+	file = inputstr
+endif
+
+sprintf2 constr '%s:%s /ssh /2 /auth=publickey /user=%s /keyfile=%s' host port user file
+
+messagebox constr ''
+connect constr
