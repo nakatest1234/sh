@@ -1,6 +1,7 @@
 #!/bin/sh
 
 ### CONFIG
+MYNETWORK=192.168.0.0/24
 ALLOW_IPS=(
 192.168.0.0/16
 172.16.0.0/12
@@ -16,6 +17,8 @@ https://ipv4.fetus.jp/in.txt
 
 CONFFILE="/etc/sysconfig/iptables"
 CMD_RESTART="/sbin/service iptables restart"
+#CONFFILE="/etc/sysconfig/iptables"
+#CMD_RESTART="/bin/systemctl restart iptables.service"
 
 cp -p ${CONFFILE} `basename ${CONFFILE}`.bk
 
@@ -33,6 +36,24 @@ cat << EOS > ${TMPFILE}
 -A INPUT -j ACCEPT -i lo
 -A INPUT -j ACCEPT -m state --state ESTABLISHED,RELATED
 
+### flagment
+-A INPUT -j DROP -f
+
+### NetBIOS
+-A INPUT  -j DROP -s ! ${MYNETWORK} -p tcp -m multiport --dports 135,137,138,139,445
+-A INPUT  -j DROP -s ! ${MYNETWORK} -p udp -m multiport --dports 135,137,138,139,445
+-A OUTPUT -j DROP -d ! ${MYNETWORK} -p tcp -m multiport --dports 135,137,138,139,445
+-A OUTPUT -j DROP -d ! ${MYNETWORK} -p udp -m multiport --dports 135,137,138,139,445
+
+-A INPUT -j DROP -s 127.0.0.0/8
+-A INPUT -j DROP -s 169.254.0.0/16
+-A INPUT -j DROP -s 192.0.2.0/24
+-A INPUT -j DROP -s 224.0.0.0/4
+-A INPUT -j DROP -s 240.0.0.0/5
+
+-A INPUT -j DROP -d 0.0.0.0/8
+-A INPUT -j DROP -d 255.255.255.255/32
+
 EOS
 
 
@@ -46,6 +67,11 @@ fi
 
 ### MAIN
 cat << EOS >> ${TMPFILE}
+
+### IP spoofing
+-A INPUT -j DROP -s 10.0.0.0/8
+-A INPUT -j DROP -s 172.16.0.0/12
+-A INPUT -j DROP -s 192.168.0.0/16
 
 ### DROP IP
 -A INPUT -j DENY_IP_CHAIN
@@ -64,14 +90,10 @@ cat << EOS >> ${TMPFILE}
 -A INPUT -j STEALTH_SCAN -p tcp --tcp-flags ACK,PSH PSH
 -A INPUT -j STEALTH_SCAN -p tcp --tcp-flags ACK,URG URG
 
-### flagment
--A INPUT -f -j DROP
-
+### original
 #-A INPUT -j ACCEPT_COUNTRY -p tcp -m state --state NEW -m tcp --dport ssh
 #-A INPUT -j ACCEPT_COUNTRY -p tcp -m state --state NEW -m tcp --dport 8081:8084
-
--A INPUT  -j ACCEPT -p tcp -m state --state NEW -m tcp -m multiport --dports http,https
-
+#-A INPUT -j ACCEPT         -p tcp -m state --state NEW -m tcp -m multiport --dports http,https
 #-A OUTPUT -j DROP -p tcp -m multiport --dports memcache,mysql ! -d 10.0.1.110/32
 
 ### last
