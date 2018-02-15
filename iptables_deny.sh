@@ -40,10 +40,10 @@ cat << EOS > ${TMPFILE}
 -A INPUT -j DROP -f
 
 ### NetBIOS
--A INPUT  -j DROP -s ! ${MYNETWORK} -p tcp -m multiport --dports 135,137,138,139,445
--A INPUT  -j DROP -s ! ${MYNETWORK} -p udp -m multiport --dports 135,137,138,139,445
--A OUTPUT -j DROP -d ! ${MYNETWORK} -p tcp -m multiport --dports 135,137,138,139,445
--A OUTPUT -j DROP -d ! ${MYNETWORK} -p udp -m multiport --dports 135,137,138,139,445
+-A INPUT  -j DROP ! -s ${MYNETWORK} -p tcp -m multiport --dports 135,137,138,139,445
+-A INPUT  -j DROP ! -s ${MYNETWORK} -p udp -m multiport --dports 135,137,138,139,445
+-A OUTPUT -j DROP ! -d ${MYNETWORK} -p tcp -m multiport --dports 135,137,138,139,445
+-A OUTPUT -j DROP ! -d ${MYNETWORK} -p udp -m multiport --dports 135,137,138,139,445
 
 -A INPUT -j DROP -s 127.0.0.0/8
 -A INPUT -j DROP -s 169.254.0.0/16
