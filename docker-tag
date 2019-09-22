@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# required jq command
+
+if [ $# -eq 0 ]; then
+	echo "${0} <name>" >&2
+	exit 1
+fi
+
+curl -sS "https://registry.hub.docker.com/v1/repositories/php/tags" | jq '.[]["name"]' | grep ${1}
