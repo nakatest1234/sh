@@ -1,7 +1,5 @@
 #!/bin/sh
 
-## need "Development tools"
-
 set -eu
 
 EXEC_DIR=$(dirname $(readlink -f $0))
@@ -31,8 +29,13 @@ atexit() {
 trap atexit EXIT
 trap 'trap - EXIT; atexit; exit -1' SIGHUP SIGINT SIGTERM ERR
 
-sudo yum install -q -y libjpeg giflib libpng freetype libjpeg-devel giflib-devel libpng-devel freetype-devel
-sudo ldconfig
+yum install -q -y wget tar gcc make autoconf gcc-c++
+
+## RHEL6: not found OpenEXR-devel
+## RHEK6: lcms-devel
+## RHEL7: lcms2-devel
+yum install -q -y libjpeg giflib libpng freetype libwebp libjpeg-devel giflib-devel libpng-devel freetype-devel libwebp-devel bzip2-devel libtiff-devel zlib-devel ghostscript-devel libwmf-devel jasper-devel libtool-ltdl-devel libX11-devel libXext-devel libXt-devel libxml2-devel lcms-devel lcms2-devel librsvg2-devel OpenEXR-devel
+ldconfig
 
 echo "download ghostscript"
 wget -q -O - ${GS_URL} | tar xfz - --strip=1 -C ${GS_TMP}
@@ -43,16 +46,16 @@ wget -q -O - ${IM_URL} | tar xfz - --strip=1 -C ${IM_TMP}
 cd ${EXEC_DIR}
 cd ${GS_TMP}
 ./configure --prefix=/usr/local --enable-dynamic --disable-compile-inits --with-system-libtiff --with-x --with-drivers=ALL --without-luratech --with-libiconv=gnu
-make -j$(nproc)
-sudo make install
+make --quiet -j$(nproc)
+make install
 
 cd ${EXEC_DIR}
 cd ${IM_TMP}
 ./configure --prefix=/usr/local --without-x
-make -j$(nproc)
+make --quiet -j$(nproc)
 make check
-sudo make uninstall
-sudo make install
+make uninstall
+make install
 ${IM_CMD} -list format && :
 
 cd ${EXEC_DIR}
@@ -71,11 +74,11 @@ cd ${EXEC_DIR}
 echo "download ipa fonts"
 wget -q -O ${IPA_ZIP} ${IPA1} && unzip -q -j ${IPA_ZIP} "*.ttf" -d ${IPA_TMP}
 wget -q -O ${IPA_ZIP} ${IPA2} && unzip -q -j ${IPA_ZIP} "*.ttf" -d ${IPA_TMP}
-sudo cp -p ${IPA_TMP}/*.* ${GSPATH}
+cp -p ${IPA_TMP}/*.* ${GSPATH}
 
 echo "download ghostscript fonts"
-wget -q -O - ${GSFONT_URL} | sudo tar xfz - --strip=1 -C ${GSPATH}
+wget -q -O - ${GSFONT_URL} | tar xfz - --strip=1 -C ${GSPATH}
 
-sudo chown -R root.  ${GSPATH}
+chown -R root.  ${GSPATH}
 
 fc-cache -f
